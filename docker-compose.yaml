@@ -1,0 +1,763 @@
+version: '3.4'
+
+networks:
+  byfn:
+    external:
+      name: fabric
+
+services:
+
+  peer0-site1-v2soft-com:
+    image: hyperledger/fabric-peer:2.2
+    container_name: peer0-site1-v2soft-com
+    hostname: peer0.site1.v2soft.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.site1.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site1MSP
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.site1.v2soft.com:7052
+      - CORE_PEER_ADDRESS=peer0.site1.v2soft.com:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.site1.v2soft.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.site1.v2soft.com:8051
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 7051
+        target: 7051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer0.site1.v2soft.com
+
+  peer1-site1-v2soft-com:
+    container_name: peer1-site1-v2soft-com
+    hostname: peer1.site1.v2soft.com
+    image: hyperledger/fabric-peer:2.2
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer1.site1.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site1MSP
+      - CORE_PEER_ADDRESS=peer1.site1.v2soft.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.site1.v2soft.com:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.site1.v2soft.com:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.site1.v2soft.com:8052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer1.site1.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer1.site1.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 8051
+        target: 8051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer1.site1.v2soft.com
+
+  peer0-site2-v2soft-com:
+    image: hyperledger/fabric-peer:2.2
+    container_name: peer0-site2-v2soft-com
+    hostname: peer0.site2.v2soft.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.site2.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site2MSP
+      - CORE_PEER_ADDRESS=peer0.site2.v2soft.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.site2.v2soft.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.site2.v2soft.com:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.site2.v2soft.com:9052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 9051
+        target: 9051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer0.site2.v2soft.com
+  
+  peer1-site2-v2soft-com:
+    container_name: peer1-site2-v2soft-com
+    hostname: peer1.site2.v2soft.com
+    image: hyperledger/fabric-peer:2.2
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer1.site2.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site2MSP
+      - CORE_PEER_ADDRESS=peer1.site2.v2soft.com:10051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.site2.v2soft.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.site2.v2soft.com:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.site2.v2soft.com:10052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer1.site2.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer1.site2.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 10051
+        target: 10051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer1.site2.v2soft.com
+
+  peer0-site3-v2soft-com:
+    image: hyperledger/fabric-peer:2.2
+    container_name: peer0-site3-v2soft-com
+    hostname: peer0.site3.v2soft.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.site3.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site3MSP
+      - CORE_PEER_ADDRESS=peer0.site3.v2soft.com:11051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:11051      
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.site3.v2soft.com:11051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.site3.v2soft.com:12051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.site3.v2soft.com:11052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 11051
+        target: 11051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer0.site3.v2soft.com
+
+  peer1-site3-v2soft-com:
+    container_name: peer1-site3-v2soft-com
+    hostname: peer1.site3.v2soft.com
+    image: hyperledger/fabric-peer:2.2
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer1.site3.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site3MSP
+      - CORE_PEER_ADDRESS=peer1.site3.v2soft.com:12051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:12051      
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:12052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.site3.v2soft.com:12051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.site3.v2soft.com:11051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.site3.v2soft.com:12052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer1.site3.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer1.site3.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 12051
+        target: 12051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer1.site3.v2soft.com
+  
+  peer0-site4-v2soft-com:
+    image: hyperledger/fabric-peer:2.2
+    container_name: peer0-site4-v2soft-com
+    hostname: peer0.site4.v2soft.com
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer0.site4.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site4MSP
+      - CORE_PEER_ADDRESS=peer0.site4.v2soft.com:13051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:13051      
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:13052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.site4.v2soft.com:13051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.site4.v2soft.com:14051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.site4.v2soft.com:13052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 13051
+        target: 13051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer0.site4.v2soft.com
+
+  peer1-site4-v2soft-com:
+    container_name: peer1-site4-v2soft-com
+    hostname: peer1.site4.v2soft.com
+    image: hyperledger/fabric-peer:2.2
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=artifacts_default
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_PEER_ID=peer1.site4.v2soft.com
+      - CORE_PEER_LOCALMSPID=Site4MSP
+      - CORE_PEER_ADDRESS=peer1.site4.v2soft.com:14051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:14051      
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:14052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.site4.v2soft.com:14051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.site4.v2soft.com:13051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.site4.v2soft.com:14052
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer1.site4.v2soft.com/msp:/etc/hyperledger/fabric/msp
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer1.site4.v2soft.com/tls:/etc/hyperledger/fabric/tls
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 14051
+        target: 14051
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - peer1.site4.v2soft.com
+
+  ca-site1-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site1
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site1.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7c17dd6455fbf9a10a3636f5190b115730a571cc3f462af936a6e0efb177d164_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site1.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7c17dd6455fbf9a10a3636f5190b115730a571cc3f462af936a6e0efb177d164_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    container_name: ca_peerSite1
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 7054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site1.v2soft.com
+
+  ca-site2-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site2
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site2.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8ecb4c3467a06ab6ec523376ae15b37e168393c513593037bc8a61cc5ee9ee7_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site2.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8ecb4c3467a06ab6ec523376ae15b37e168393c513593037bc8a61cc5ee9ee7_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite2
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 8054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site2.v2soft.com
+
+  ca-site3-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site3
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site3.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5bae647988906b2904e9603357dd97567fca76d10a885d54c734718eed9648e8_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site3.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5bae647988906b2904e9603357dd97567fca76d10a885d54c734718eed9648e8_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true # change to false to disable TLS
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite3
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 9054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site3.v2soft.com
+
+  ca-site4-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site4
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site4.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9368c733e6b291754bdaf89ee6e66e58ce3f2df7d54b0070dcbb85e6de2fc48d_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site4.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9368c733e6b291754bdaf89ee6e66e58ce3f2df7d54b0070dcbb85e6de2fc48d_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true # change to false to disable TLS
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite4
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 10054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site4.v2soft.com
+
+  orderer-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    container_name: orderer-v2soft-com
+    hostname: orderer.v2soft.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel:/etc/hyperledger/configtx
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer.v2soft.com/msp/:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer.v2soft.com/tls/:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 7050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer.v2soft.com
+
+  orderer2-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    container_name: orderer2-v2soft-com
+    hostname: orderer2.v2soft.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer2.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer2.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 8050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer2.v2soft.com
+
+  orderer3-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:      
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer3.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer3.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer 
+    container_name: orderer3-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 9050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer3.v2soft.com
+
+  orderer4-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer4.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer4.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    container_name: orderer4-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 10050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer4.v2soft.com
+
+  orderer5-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:      
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer5.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer5.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer 
+    container_name: orderer5-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - published: 11050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer5.v2soft.com

@@ -1,0 +1,394 @@
+version: '3.4'
+
+networks:
+  byfn:
+    external:
+      name: fabric
+
+services:
+
+  ca-site1-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site1
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site1.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7c17dd6455fbf9a10a3636f5190b115730a571cc3f462af936a6e0efb177d164_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site1.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/7c17dd6455fbf9a10a3636f5190b115730a571cc3f462af936a6e0efb177d164_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    container_name: ca_peerSite1
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 7054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site1.v2soft.com
+
+  ca-site2-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site2
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site2.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8ecb4c3467a06ab6ec523376ae15b37e168393c513593037bc8a61cc5ee9ee7_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site2.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d8ecb4c3467a06ab6ec523376ae15b37e168393c513593037bc8a61cc5ee9ee7_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite2
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 8054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site2.v2soft.com
+
+  ca-site3-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site3
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site3.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5bae647988906b2904e9603357dd97567fca76d10a885d54c734718eed9648e8_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site3.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5bae647988906b2904e9603357dd97567fca76d10a885d54c734718eed9648e8_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true # change to false to disable TLS
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite3
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 9054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site3.v2soft.com
+
+  ca-site4-v2soft-com:
+    image: hyperledger/fabric-ca:1.5.5
+    environment:
+      - FABRIC_CA_SERVER_CA_NAME=ca-site4
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site4.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9368c733e6b291754bdaf89ee6e66e58ce3f2df7d54b0070dcbb85e6de2fc48d_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.site4.v2soft.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/9368c733e6b291754bdaf89ee6e66e58ce3f2df7d54b0070dcbb85e6de2fc48d_sk
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_TLS_ENABLED=true # change to false to disable TLS
+    command: sh -c 'cp /etc/config/fabric-ca-server-config.yaml /etc/hyperledger/fabric-ca-server/. && fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./fabric-ca-server-config/:/etc/config
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peerSite4
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 10054
+        target: 7054
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - ca.site4.v2soft.com
+
+  orderer-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    container_name: orderer-v2soft-com
+    hostname: orderer.v2soft.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel:/etc/hyperledger/configtx
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer.v2soft.com/msp/:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer.v2soft.com/tls/:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+      - ../../backup/orderer:/var/hyperledger/production/orderer
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 7050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer.v2soft.com
+
+  orderer2-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    container_name: orderer2-v2soft-com
+    hostname: orderer2.v2soft.com
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer2.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer2.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+      - ../../backup/orderer2:/var/hyperledger/production/orderer
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 8050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer2.v2soft.com
+
+  orderer3-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:      
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer3.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer3.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+      - ../../backup/orderer3:/var/hyperledger/production/orderer  
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer 
+    container_name: orderer3-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 9050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer3.v2soft.com
+
+  orderer4-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer4.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer4.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+      - ../../backup/orderer4:/var/hyperledger/production/orderer
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    container_name: orderer4-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 10050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer4.v2soft.com
+
+  orderer5-v2soft-com:
+    image: hyperledger/fabric-orderer:2.2
+    restart: always
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/orderer/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/orderer/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite1/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite2/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite3/tls/ca.crt,
+          /etc/hyperledger/orderer/peerSite4/tls/ca.crt]
+    volumes:      
+      - ./channel/genesis.block:/etc/hyperledger/orderer/genesis.block
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer5.v2soft.com/msp:/etc/hyperledger/orderer/msp
+      - ./channel/crypto-config/ordererOrganizations/v2soft.com/orderers/orderer5.v2soft.com/tls:/etc/hyperledger/orderer/tls
+      - ./channel/crypto-config/peerOrganizations/site1.v2soft.com/peers/peer0.site1.v2soft.com/:/etc/hyperledger/orderer/peerSite1
+      - ./channel/crypto-config/peerOrganizations/site2.v2soft.com/peers/peer0.site2.v2soft.com/:/etc/hyperledger/orderer/peerSite2
+      - ./channel/crypto-config/peerOrganizations/site3.v2soft.com/peers/peer0.site3.v2soft.com/:/etc/hyperledger/orderer/peerSite3
+      - ./channel/crypto-config/peerOrganizations/site4.v2soft.com/peers/peer0.site4.v2soft.com/:/etc/hyperledger/orderer/peerSite4
+      - ../../backup/orderer5:/var/hyperledger/production/orderer  
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer 
+    container_name: orderer5-v2soft-com
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname == ip-172-31-42-6
+    ports:
+      - published: 11050
+        target: 7050
+        mode: host
+    networks:
+      byfn:
+        aliases:
+          - orderer5.v2soft.com
